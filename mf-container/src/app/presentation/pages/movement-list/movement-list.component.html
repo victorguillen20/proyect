@@ -1,0 +1,123 @@
+<div class="container">
+  <div class="toast-notification" [ngClass]="'toast-' + notificationType" *ngIf="showNotification">
+    {{ notificationMessage }}
+  </div>
+
+  <div class="page-header">
+
+    <h1 class="title">Movimientos</h1>
+  </div>
+  
+  <div class="toolbar">
+    <div class="search-box">
+      <input 
+        type="text" 
+        [(ngModel)]="searchTerm" 
+        (ngModelChange)="onSearchChange($event)"
+        placeholder="Buscar..."
+        class="search-input"
+      />
+    </div>
+    <button class="btn-yellow" (click)="openCreateModal()">Nuevo</button>
+  </div>
+
+  <div class="table-container">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Numero Cuenta</th>
+          <th>Tipo</th>
+          <th>Saldo Inicial</th>
+          <th>Estado</th>
+          <th>Movimiento</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let mov of movements">
+          <td>{{ mov.account?.accountNumber }}</td>
+          <td>{{ mov.movementType }}</td>
+          <td>{{ ((mov.balance || 0) - mov.value) | currency }}</td>
+          <td>{{ mov.account?.status ? 'True' : 'False' }}</td>
+          <td>{{ mov.movementDetail }}</td>
+          <td class="actions-cell">
+            <div class="kebab-menu" (click)="toggleDropdown(mov.movementId)">
+              <span>&#8942;</span>
+              <div class="dropdown" *ngIf="activeDropdownId === mov.movementId">
+                <button (click)="openUpdateModal(mov); $event.stopPropagation()">Actualizar</button>
+                <button (click)="promptDelete(mov.movementId!); $event.stopPropagation()">Eliminar</button>
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr *ngIf="movements.length === 0">
+           <td colspan="7" class="no-results" style="text-align:center; padding: 20px;">No se encontraron resultados</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="pagination-controls" style="margin-top: 20px; display: flex; align-items: center; justify-content: center; gap: 10px;">
+    <span style="margin-right: 15px;">{{ (currentPage * pageSize) + 1 }} - {{ (currentPage + 1) * pageSize > totalElements ? totalElements : (currentPage + 1) * pageSize }} de {{ totalElements }} registros</span>
+    
+    <button [disabled]="currentPage === 0" (click)="changePage(currentPage - 1)" class="btn-yellow" style="width: auto; padding: 5px 10px;">Anterior</button>
+    
+    <select [ngModel]="currentPage" (ngModelChange)="changePage($event)" style="padding: 5px;">
+      <option *ngFor="let p of [].constructor(totalPages); let i = index" [value]="i">
+        Página {{ i + 1 }}
+      </option>
+    </select>
+    
+    <button [disabled]="currentPage >= totalPages - 1" (click)="changePage(currentPage + 1)" class="btn-yellow" style="width: auto; padding: 5px 10px;">Siguiente</button>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="showModal">
+  <div class="modal-content">
+    <h2>{{ modalMode === 'create' ? 'Nuevo Movimiento' : 'Actualizar Movimiento' }}</h2>
+    
+    <div class="form-group" *ngIf="modalMode === 'create'">
+      <label>N° Cuenta</label>
+      <input 
+        type="number" 
+        [ngModel]="currentMovement.accountId" 
+        (ngModelChange)="currentMovement.accountId=$event; onAccountIdChange($event)"
+        class="form-input" 
+        placeholder="Número de Cuenta">
+    </div>
+
+    <div class="form-group">
+        <label>Tipo</label>
+        <select [(ngModel)]="currentMovement.movementType" class="form-input" [disabled]="isAccountTypeLocked">
+          <option value="Ahorro">Ahorro</option>
+          <option value="Corriente">Corriente</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+      <label>Valor</label>
+      <input type="number" [(ngModel)]="currentMovement.value" class="form-input" placeholder="Ej: 100 o -100 (+ Depósito, - para Retiro)">
+      <small style="color: gray; display: block; margin-top: 5px;">Use valores positivos para depósitos y negativos para retiros.</small>
+    </div>
+
+    <div class="form-group">
+      <label>Detalle del Movimiento</label>
+      <input type="text" [(ngModel)]="currentMovement.movementDetail" class="form-input" placeholder="Ingrese detalle (opcional)">
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" (click)="closeModal()">Cancelar</button>
+      <button class="btn-yellow" (click)="saveMovement()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="showDeleteModal">
+  <div class="modal-content small-modal">
+    <p>¿Está seguro de que desea eliminar este registro?</p>
+    <div class="modal-actions">
+      <button class="btn-cancel" (click)="cancelDelete()">Cancelar</button>
+      <button class="btn-yellow" (click)="confirmDelete()">Aceptar</button>
+    </div>
+  </div>
+</div>

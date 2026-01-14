@@ -1,0 +1,88 @@
+<div class="container">
+  <div class="toast-notification" [ngClass]="'toast-' + notificationType" *ngIf="showNotification">
+    {{ notificationMessage }}
+  </div>
+
+  <div class="page-header">
+    <h1 class="title">Reportes</h1>
+  </div>
+
+  <div class="report-filters card">
+    <div class="filter-group">
+      <input 
+        type="text" 
+        [(ngModel)]="searchTerm" 
+        (ngModelChange)="onSearchChange($event)"
+        class="search-input-v2" 
+        style="height: 30px;"
+        placeholder="Buscar...">
+    </div>
+
+    
+    <div class="filters-right">
+      <div class="filter-group">
+        <label>Fecha Inicio</label>
+        <input type="date" [(ngModel)]="startDate" class="form-input">
+      </div>
+      <div class="filter-group">
+        <label>Fecha Fin</label>
+        <input type="date" [(ngModel)]="endDate" class="form-input">
+      </div>
+      <div class="filter-group">
+        <label>Número de Cédula</label>
+        <input type="text" [(ngModel)]="clientId" class="form-input" placeholder="Número de Cédula">
+      </div>
+      <div class="filter-actions">
+        <button class="btn-yellow" (click)="generateReport()">Generar PDF</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="table-container">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Cliente</th>
+          <th>Numero Cuenta</th>
+          <th>Tipo</th>
+          <th>Saldo Inicial</th>
+          <th>Estado</th>
+          <th>Movimiento</th>
+          <th>Saldo Disponible</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of reportData">
+          <td>{{ item['Fecha'] }}</td>
+          <td>{{ item['Cliente'] }}</td>
+          <td>{{ item['Numero Cuenta'] }}</td>
+          <td>{{ item['Tipo'] }}</td>
+          
+          <td>{{ item['Saldo Inicial'] | currency }}</td>
+          <td>{{ item['Estado'] }}</td>
+          <td [class.text-red]="item['Movimiento'] < 0">{{ item['Movimiento'] | currency }}</td>
+          <td>{{ item['Saldo Disponible'] | currency }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="pagination-controls" style="margin-top: 20px; display: flex; align-items: center; justify-content: center; gap: 10px;">
+    <span style="margin-right: 15px;">{{ (currentPage * pageSize) + 1 }} - {{ (currentPage + 1) * pageSize > totalElements ? totalElements : (currentPage + 1) * pageSize }} de {{ totalElements }} registros</span>
+    
+    <button [disabled]="currentPage === 0" (click)="changePage(currentPage - 1)" class="btn-yellow" style="width: auto; padding: 5px 10px;">Anterior</button>
+    
+    <select [ngModel]="currentPage" (ngModelChange)="changePage($event)" style="padding: 5px;">
+      <option *ngFor="let p of [].constructor(totalPages); let i = index" [value]="i">
+        Página {{ i + 1 }}
+      </option>
+    </select>
+    
+    <button [disabled]="currentPage >= totalPages - 1" (click)="changePage(currentPage + 1)" class="btn-yellow" style="width: auto; padding: 5px 10px;">Siguiente</button>
+  </div>
+
+  <div *ngIf="hasSearched && reportData && reportData.length === 0" class="no-results">
+    <p>No se encontraron resultados para los filtros seleccionados.</p>
+  </div>
+</div>

@@ -1,0 +1,144 @@
+<div class="container">
+  <!-- Toast Notification -->
+  <div class="toast-notification" [ngClass]="'toast-' + notificationType" *ngIf="showNotification">
+    {{ notificationMessage }}
+  </div>
+
+  <div class="page-header">
+
+    <h1 class="title">Clientes</h1>
+  </div>
+  
+  <div class="toolbar">
+    <div class="search-box">
+      <input 
+        type="text" 
+        [(ngModel)]="searchTerm" 
+        (ngModelChange)="onSearchChange($event)"
+        placeholder="Buscar..."
+        class="search-input"
+      />
+    </div>
+    <button class="btn-yellow" (click)="openCreateModal()">Nuevo</button>
+  </div>
+
+  <div class="table-container">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Identificación</th>
+          <th>Teléfono</th>
+          <th>Estado</th>
+          <th></th> <!-- Actions Column -->
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let client of clients">
+          <td>{{ client.name }}</td>
+          <td>{{ client.identification }}</td>
+          <td>{{ client.phone }}</td>
+          <td>{{ client.status ? 'True' : 'False' }}</td>
+          <td class="actions-cell">
+            <div class="kebab-menu" (click)="toggleDropdown(client.clientId)">
+              <span>&#8942;</span> <!-- Vertical Ellipsis -->
+              <div class="dropdown" *ngIf="activeDropdownId === client.clientId">
+                <button (click)="openUpdateModal(client); $event.stopPropagation()">Actualizar</button>
+                <button (click)="promptDelete(client.clientId!); $event.stopPropagation()">Eliminar</button>
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr *ngIf="clients.length === 0">
+          <td colspan="5" class="no-results" style="text-align: center; padding: 20px;">No se encontraron resultados</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="pagination-controls" style="margin-top: 20px; display: flex; align-items: center; justify-content: center; gap: 10px;">
+    <span style="margin-right: 15px;">{{ (currentPage * pageSize) + 1 }} - {{ (currentPage + 1) * pageSize > totalElements ? totalElements : (currentPage + 1) * pageSize }} de {{ totalElements }} registros</span>
+    
+    <button [disabled]="currentPage === 0" (click)="changePage(currentPage - 1)" class="btn-yellow" style="width: auto; padding: 5px 10px;">Anterior</button>
+    
+    <select [ngModel]="currentPage" (ngModelChange)="changePage($event)" style="padding: 5px;">
+      <option *ngFor="let p of [].constructor(totalPages); let i = index" [value]="i">
+        Página {{ i + 1 }}
+      </option>
+    </select>
+    
+    <button [disabled]="currentPage >= totalPages - 1" (click)="changePage(currentPage + 1)" class="btn-yellow" style="width: auto; padding: 5px 10px;">Siguiente</button>
+  </div>
+</div>
+
+<!-- Modal Create/Update -->
+<div class="modal-overlay" *ngIf="showModal">
+  <div class="modal-content">
+    <h2>{{ modalMode === 'create' ? 'Nuevo Cliente' : 'Actualizar Cliente' }}</h2>
+    
+    <div class="form-group">
+      <label>Nombre</label>
+      <input type="text" [(ngModel)]="currentClient.name" class="form-input">
+    </div>
+    
+    <div class="form-group">
+      <label>Genero</label>
+       <select [(ngModel)]="currentClient.gender" class="form-input">
+        <option value="Male">Masculino</option>
+        <option value="Female">Femenino</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Edad</label>
+      <input type="number" [(ngModel)]="currentClient.age" class="form-input" #age="ngModel" min="18">
+      <div *ngIf="age.invalid && (age.dirty || age.touched) || (currentClient.age < 18)" class="error-message">
+        La edad debe ser mayor o igual a 18.
+      </div>
+    </div>
+    
+    <div class="form-group">
+      <label>Identificación</label>
+      <input type="text" [(ngModel)]="currentClient.identification" class="form-input">
+    </div>
+    
+    <div class="form-group">
+      <label>Dirección</label>
+      <input type="text" [(ngModel)]="currentClient.address" class="form-input">
+    </div>
+
+    <div class="form-group">
+      <label>Teléfono</label>
+      <input type="text" [(ngModel)]="currentClient.phone" class="form-input">
+    </div>
+    
+    <div class="form-group">
+      <label>Contraseña</label>
+      <input type="password" [(ngModel)]="currentClient.password" class="form-input">
+    </div>
+
+    <div class="form-group">
+      <label>Estado</label>
+      <select [(ngModel)]="currentClient.status" class="form-input">
+        <option [ngValue]="true">True</option>
+        <option [ngValue]="false">False</option>
+      </select>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" (click)="closeModal()">Cancelar</button>
+      <button class="btn-yellow" (click)="saveClient()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Delete Confirmation -->
+<div class="modal-overlay" *ngIf="showDeleteModal">
+  <div class="modal-content small-modal">
+    <p>¿Está seguro de que desea eliminar este registro?</p>
+    <div class="modal-actions">
+      <button class="btn-cancel" (click)="cancelDelete()">Cancelar</button>
+      <button class="btn-yellow" (click)="confirmDelete()">Aceptar</button>
+    </div>
+  </div>
+</div>

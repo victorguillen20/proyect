@@ -1,0 +1,23 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: ms-banking
+  datasource:
+    # 'host.docker.internal' permite conectar al postgres que corre en tu docker-compose local
+    url: jdbc:postgresql://host.docker.internal:5432/banking_db
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update # Crea/Actualiza las tablas automáticamente
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+cors:
+  allowed-origins: http://localhost:4200

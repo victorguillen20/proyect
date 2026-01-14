@@ -1,0 +1,56 @@
+# -----------------------------
+# GENERICO / SISTEMA
+# -----------------------------
+.DS_Store
+Thumbs.db
+*.log
+
+# -----------------------------
+# IDEs y EDITORES
+# -----------------------------
+# Visual Studio Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.history/
+
+# IntelliJ / Eclipse / NetBeans
+.idea/
+*.iml
+.classpath
+.project
+.settings/
+*.sublime-workspace
+
+# -----------------------------
+# JAVA / SPRING BOOT (ms-banking)
+# -----------------------------
+target/
+*.class
+*.jar
+*.war
+*.ear
+/logs/
+
+# -----------------------------
+# ANGULAR / NODE (mf-container)
+# -----------------------------
+node_modules/
+dist/
+.angular/
+coverage/
+
+# Archivos temporales y de salida
+tmp/
+out-tsc/
+bazel-out/
+testem.log
+
+# Logs de npm/yarn
+npm-debug.log
+yarn-error.log
+
+# Variables de entorno (seguridad)
+.env

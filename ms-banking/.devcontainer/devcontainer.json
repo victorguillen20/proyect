@@ -1,0 +1,13 @@
+{
+	"name": "Java Spring Boot",
+	"image": "maven:3.9-eclipse-temurin-17",
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"vscjava.vscode-java-pack",
+				"vmware.vscode-spring-boot",
+				"cweijan.vscode-postgresql-client2"
+			]
+		}
+	}
+}

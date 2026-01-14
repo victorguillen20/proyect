@@ -1,0 +1,23 @@
+{
+	"name": "Angular App",
+	"build": {
+		"dockerfile": "Dockerfile"
+	},
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"Angular.ng-template",
+				"dbaeumer.vscode-eslint",
+				"esbenp.prettier-vscode"
+			]
+		}
+	},
+	"forwardPorts": [4200],
+	"portsAttributes": {
+		"4200": {
+			"label": "Angular App",
+			"onAutoForward": "notify"
+		}
+	},
+	"postCreateCommand": "npm install && npx puppeteer browsers install chrome"
+}
